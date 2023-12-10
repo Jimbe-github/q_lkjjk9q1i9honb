@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AddTaskFragment">
+
+  <TextView
+      android:id="@+id/taskname_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="TaskName:"
+      app:layout_constraintBaseline_toBaselineOf="@id/editTextTaskName"
+      app:layout_constraintStart_toStartOf="parent" />
+  <EditText
+      android:id="@+id/editTextTaskName"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/taskname_label"
+      app:layout_constraintTop_toTopOf="parent" />
+  <TextView
+      android:id="@+id/datetime_label"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="DateTime:"
+      app:layout_constraintBaseline_toBaselineOf="@id/editTextDateTime"
+      app:layout_constraintStart_toStartOf="parent" />
+  <EditText
+      android:id="@+id/editTextDateTime"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:inputType="none"
+      android:focusable="false"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/datetime_label"
+      app:layout_constraintTop_toBottomOf="@id/editTextTaskName" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
