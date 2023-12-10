@@ -35,10 +35,10 @@ public class TodoFragment extends Fragment {
       taskAdapter.addTask((Task) result.getSerializable(AddTaskFragment.RESULTKEY_TASK));
     });
 
-    Button btBackStudy = view.findViewById(R.id.btBackTodo);
-    btBackStudy.setOnClickListener(v -> {
+    Button backButton = view.findViewById(R.id.btBackTodo);
+    backButton.setOnClickListener(v -> {
       Toast.makeText(getContext(), "戻るボタンがクリックされました", Toast.LENGTH_SHORT).show();
-      getParentFragmentManager().setFragmentResult("", new Bundle()); //(MainActivity に)通知
+      getParentFragmentManager().setFragmentResult(REQUEST_KEY, new Bundle()); //(MainActivity に)通知
     });
 
     Button addButton = view.findViewById(R.id.btAdd);
@@ -76,16 +76,16 @@ class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
   }
 
   static class ViewHolder extends RecyclerView.ViewHolder {
-    private final TextView taskName, dateTime;
+    private final TextView nameView, datetimeView;
 
     public ViewHolder(@NonNull ViewGroup parent) {
       super(LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false));
-      taskName = itemView.findViewById(R.id.taskNameTextView);
-      dateTime = itemView.findViewById(R.id.dateTimeTextView);
+      nameView = itemView.findViewById(R.id.taskNameTextView);
+      datetimeView = itemView.findViewById(R.id.dateTimeTextView);
     }
     void bind(Task task) {
-      taskName.setText(task.taskName);
-      dateTime.setText(task.getDateTime());
+      nameView.setText(task.name);
+      datetimeView.setText(task.getDatetime());
     }
   }
 }
@@ -93,19 +93,19 @@ class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
 class Task implements Serializable {
   static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm");
 
-  final String taskName;
-  final LocalDateTime dateTime;
+  final String name;
+  final LocalDateTime datetime;
 
-  public Task(String taskName, LocalDateTime dateTime) {
-    this.taskName = taskName;
-    this.dateTime = dateTime;
+  public Task(String name, LocalDateTime datetime) {
+    this.name = name;
+    this.datetime = datetime;
   }
-  String getDateTime() {
-    return formatter.format(dateTime);
+  String getDatetime() {
+    return formatter.format(datetime);
   }
 
   @Override
   public String toString() {
-    return taskName + " at " + getDateTime();
+    return name + " at " + getDatetime();
   }
 }
