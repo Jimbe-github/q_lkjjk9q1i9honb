@@ -3,59 +3,136 @@ package jp.example.q_lkjjk9q1i9honb;
 import androidx.annotation.*;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
 
 import android.app.*;
 import android.os.Bundle;
+import android.text.*;
 import android.view.*;
 import android.widget.*;
 
 import java.time.*;
+import java.util.*;
+import java.util.function.Consumer;
 
 public class AddTaskFragment extends DialogFragment {
   static final String REQUEST_KEY = "AddTaskFragment";
   static final String RESULTKEY_TASK = "task";
+  static final String RESULTKEY_INDEX = "index";
 
-  private EditText nameView, datetimeView;
-  private LocalDateTime datetime;
+  private static final String ARGS_INDEX = "index";
+  private static final String ARGS_TASK = "task";
+
+  static void showDialog(FragmentManager fm) {
+    new AddTaskFragment().show(fm, null);
+  }
+  static void showDialog(FragmentManager fm, int index, Task task) {
+    AddTaskFragment fragment = new AddTaskFragment();
+    Bundle args = new Bundle();
+    args.putInt(ARGS_INDEX, index);
+    args.putSerializable(ARGS_TASK, task);
+    fragment.setArguments(args);
+    fragment.show(fm, null);
+  }
+
+  private int orgIndex = -1;
+
+  private static class DatetimeManager { //LiveData的
+    private LocalDateTime datetime;
+    private Set<Consumer<LocalDateTime>> observerSet = new HashSet<>();
+    void observe(Consumer<LocalDateTime> observer) {
+      observerSet.add(observer);
+      observer.accept(datetime);
+    }
+    void setValue(LocalDateTime dt) {
+      datetime = dt;
+      for(Consumer<LocalDateTime> observer : observerSet) observer.accept(datetime);
+    }
+    LocalDateTime getValue() { return datetime; }
+  }
+  DatetimeManager datetimeManager = new DatetimeManager();
 
   @NonNull
   @Override
   public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
     View view = LayoutInflater.from(requireContext()).inflate(R.layout.fragment_add_task, null);
 
-    datetime = LocalDateTime.now();
+    datetimeManager.setValue(LocalDateTime.now()); //初期値
 
-    nameView = view.findViewById(R.id.editTextTaskName);
-    datetimeView = view.findViewById(R.id.editTextDateTime);
-    datetimeView.setOnClickListener(v -> showDatePickerDialog());
+    EditText nameView = view.findViewById(R.id.name_edit);
 
-    return new AlertDialog.Builder(requireContext())
-            .setTitle("Add Task")
+    //Date
+    TextView dateView = view.findViewById(R.id.date_text);
+    dateView.setOnClickListener(v ->
+      showDatePickerDialog(datetimeManager.getValue(), date ->
+        datetimeManager.setValue(datetimeManager.getValue().with(date))
+      )
+    );
+
+    //Time
+    TextView timeView = view.findViewById(R.id.time_text);
+    timeView.setOnClickListener(v ->
+      showTimePickerDialog(datetimeManager.getValue(), time ->
+        datetimeManager.setValue(datetimeManager.getValue().with(time))
+      )
+    );
+
+    datetimeManager.observe(datetime -> {
+      dateView.setText(Task.dateFormatter.format(datetime));
+      timeView.setText(Task.timeFormatter.format(datetime));
+    });
+
+    Bundle args = getArguments();
+    if(args != null) {
+      orgIndex = args.getInt(ARGS_INDEX, -1);
+      Task orgTask = (Task)args.getSerializable(ARGS_TASK);
+      if(orgTask != null) {
+        nameView.setText(orgTask.name);
+        datetimeManager.setValue(orgTask.datetime);
+      }
+    }
+
+    AlertDialog dialog = new AlertDialog.Builder(requireContext())
+            .setTitle((orgIndex>=0?"Edit":"Add") + " Task")
             .setView(view)
             .setPositiveButton("保存", (d, w) -> {
-              String name = nameView.getText().toString();
               Bundle result = new Bundle();
-              result.putSerializable(RESULTKEY_TASK, new Task(name, datetime));
+              result.putSerializable(RESULTKEY_TASK, new Task(nameView.getText().toString(), datetimeManager.getValue()));
+              if(orgIndex >= 0) result.putInt(RESULTKEY_INDEX, orgIndex);
               getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
               dismiss();
             })
             .setNegativeButton("キャンセル", (d, w) -> dismiss())
             .create();
+
+    dialog.setOnShowListener(d -> {
+      Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE); //これはダイアログ表示後しか出来ない
+      positiveButton.setEnabled(nameView.getText().length() > 0);
+
+      nameView.addTextChangedListener(new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { /*no process*/ }
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { /*no process*/ }
+        @Override
+        public void afterTextChanged(Editable s) {
+          positiveButton.setEnabled(s.length() > 0);
+        }
+      });
+    });
+
+    return dialog;
   }
 
-  private void showDatePickerDialog() {
-    DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (v, y, m, d) -> { //m: 0-11
-      datetime = datetime.with(LocalDate.of(y, m+1, d)); //m: 1-12
-      showTimePickerDialog();
-    }, datetime.getYear(), datetime.getMonthValue()-1, datetime.getDayOfMonth()); //m: 0-11
-    datePickerDialog.show();
+  private void showDatePickerDialog(LocalDateTime datetime, Consumer<LocalDate> listener) {
+    new DatePickerDialog(getContext(),
+            (v, y, m, d) -> listener.accept(LocalDate.of(y, m+1, d)),
+            datetime.getYear(), datetime.getMonthValue()-1, datetime.getDayOfMonth()).show();
   }
 
-  private void showTimePickerDialog() {
-    TimePickerDialog timePickerDialog = new TimePickerDialog(getContext(), (v, h, m) -> {
-      datetime = datetime.with(LocalTime.of(h, m));
-      datetimeView.setText(Task.formatter.format(datetime));
-    }, datetime.getHour(), datetime.getMinute(), true);
-    timePickerDialog.show();
+  private void showTimePickerDialog(LocalDateTime datetime, Consumer<LocalTime> listener) {
+    new TimePickerDialog(getContext(),
+            (v, h, m) -> listener.accept(LocalTime.of(h, m)),
+            datetime.getHour(), datetime.getMinute(), true).show();
   }
 }

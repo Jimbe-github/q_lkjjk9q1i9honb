@@ -3,38 +3,52 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp"
     tools:context=".AddTaskFragment">
 
   <TextView
-      android:id="@+id/taskname_label"
+      android:id="@+id/name_label"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="TaskName:"
-      app:layout_constraintBaseline_toBaselineOf="@id/editTextTaskName"
+      android:text="Name:"
+      android:textSize="30sp"
+      app:layout_constraintBaseline_toBaselineOf="@id/name_edit"
       app:layout_constraintStart_toStartOf="parent" />
   <EditText
-      android:id="@+id/editTextTaskName"
+      android:id="@+id/name_edit"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:hint="(name)"
+      android:inputType="text"
+      android:textSize="30sp"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toEndOf="@id/taskname_label"
+      app:layout_constraintStart_toEndOf="@id/name_label"
       app:layout_constraintTop_toTopOf="parent" />
+
   <TextView
-      android:id="@+id/datetime_label"
+      android:id="@+id/date_text"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:text="DateTime:"
-      app:layout_constraintBaseline_toBaselineOf="@id/editTextDateTime"
-      app:layout_constraintStart_toStartOf="parent" />
-  <EditText
-      android:id="@+id/editTextDateTime"
-      android:layout_width="0dp"
+      android:layout_marginTop="8dp"
+      android:drawablePadding="4dp"
+      android:textSize="30sp"
+      app:drawableStartCompat="@drawable/ic_dateselect"
+      app:layout_constraintEnd_toStartOf="@id/time_text"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/name_edit"
+      tools:text="2012/12/21" />
+
+  <TextView
+      android:id="@+id/time_text"
+      android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:inputType="none"
-      android:focusable="false"
+      android:drawablePadding="4dp"
+      android:textSize="30sp"
+      app:drawableStartCompat="@drawable/ic_timeselect"
+      app:layout_constraintBaseline_toBaselineOf="@id/date_text"
       app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toEndOf="@id/datetime_label"
-      app:layout_constraintTop_toBottomOf="@id/editTextTaskName" />
+      app:layout_constraintStart_toEndOf="@id/date_text"
+      tools:text="01:23" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
