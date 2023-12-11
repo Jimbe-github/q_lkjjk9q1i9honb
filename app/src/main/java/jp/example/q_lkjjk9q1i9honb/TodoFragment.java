@@ -30,6 +30,7 @@ public class TodoFragment extends Fragment {
 
     TaskAdapter taskAdapter = new TaskAdapter((i,task) -> AddTaskFragment.showDialog(fm,i,task));
     RecyclerView recyclerView = view.findViewById(R.id.recyclerViewTasks);
+    recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
     recyclerView.setAdapter(taskAdapter);
 
     fm.setFragmentResultListener(AddTaskFragment.REQUEST_KEY, getViewLifecycleOwner(), (rkey, result) -> {

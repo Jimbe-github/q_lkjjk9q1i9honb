@@ -6,6 +6,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import android.app.*;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.*;
 import android.view.*;
@@ -63,6 +64,7 @@ public class AddTaskFragment extends DialogFragment {
 
     //Date
     TextView dateView = view.findViewById(R.id.date_text);
+    dateView.setPaintFlags(dateView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     dateView.setOnClickListener(v ->
       showDatePickerDialog(datetimeManager.getValue(), date ->
         datetimeManager.setValue(datetimeManager.getValue().with(date))
@@ -71,6 +73,7 @@ public class AddTaskFragment extends DialogFragment {
 
     //Time
     TextView timeView = view.findViewById(R.id.time_text);
+    timeView.setPaintFlags(timeView.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
     timeView.setOnClickListener(v ->
       showTimePickerDialog(datetimeManager.getValue(), time ->
         datetimeManager.setValue(datetimeManager.getValue().with(time))
