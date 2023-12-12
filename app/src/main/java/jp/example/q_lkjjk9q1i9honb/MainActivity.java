@@ -1,25 +1,40 @@
 package jp.example.q_lkjjk9q1i9honb;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
+import androidx.appcompat.widget.Toolbar;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.navigation.*;
+import androidx.navigation.ui.*;
 
 import android.os.Bundle;
-import android.util.Log;
+
+import com.google.android.material.navigation.NavigationView;
 
 public class MainActivity extends AppCompatActivity {
+  private AppBarConfiguration appBarConfiguration;
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    FragmentManager fm = getSupportFragmentManager();
-    fm.setFragmentResultListener(TodoFragment.REQUEST_KEY, this, (rkey,result)->{
-      /*TodoFragment が back したら何する? */
-      Log.d("MainActivity", "backed todofragment.");
-    });
+    Toolbar toolbar = findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
 
-    fm.beginTransaction()
-            .replace(R.id.fragment_container_view, new TodoFragment())
-            .commit();
+    DrawerLayout drawer = findViewById(R.id.drawer_layout);
+    NavigationView navigationView = findViewById(R.id.nav_view);
+
+    appBarConfiguration = new AppBarConfiguration.Builder(R.id.nav_home, R.id.nav_todo)
+            .setOpenableLayout(drawer)
+            .build();
+    NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+    NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+    NavigationUI.setupWithNavController(navigationView, navController);
+  }
+
+  @Override
+  public boolean onSupportNavigateUp() {
+    NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
+    return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
   }
 }

@@ -95,7 +95,7 @@ public class AddTaskFragment extends DialogFragment {
       }
     }
 
-    AlertDialog dialog = new AlertDialog.Builder(requireContext())
+    AlertDialog.Builder builder = new AlertDialog.Builder(requireContext())
             .setTitle((orgIndex>=0?"Edit":"Add") + " Task")
             .setView(view)
             .setPositiveButton("保存", (d, w) -> {
@@ -105,8 +105,18 @@ public class AddTaskFragment extends DialogFragment {
               getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
               dismiss();
             })
-            .setNegativeButton("キャンセル", (d, w) -> dismiss())
-            .create();
+            .setNegativeButton("キャンセル", (d, w) -> dismiss());
+    if(orgIndex >= 0) { //削除は Edit の時だけ可能
+        builder.setNeutralButton("削除", (d, w) -> {
+          //TODO 削除の最終確認は?
+          Bundle result = new Bundle();
+          //result.putSerializable(RESULTKEY_TASK, null); //Task が無いのが削除のしるし
+          result.putInt(RESULTKEY_INDEX, orgIndex);
+          getParentFragmentManager().setFragmentResult(REQUEST_KEY, result);
+          dismiss();
+        });
+    }
+    AlertDialog dialog = builder.create();
 
     dialog.setOnShowListener(d -> {
       Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE); //これはダイアログ表示後しか出来ない

@@ -16,8 +16,6 @@ import java.util.*;
 import java.util.function.*;
 
 public class TodoFragment extends Fragment {
-  static final String REQUEST_KEY = "TodoFragment";
-
   public TodoFragment() {
     super(R.layout.fragment_todo);
   }
@@ -37,16 +35,14 @@ public class TodoFragment extends Fragment {
       Task newTask = (Task)result.getSerializable(AddTaskFragment.RESULTKEY_TASK);
       int index = result.getInt(AddTaskFragment.RESULTKEY_INDEX, -1);
       if(index >= 0) {
-        taskAdapter.set(index, newTask);
+        if(newTask == null) {
+          taskAdapter.remove(index);
+        } else {
+          taskAdapter.set(index, newTask);
+        }
       } else {
         taskAdapter.add(newTask);
       }
-    });
-
-    Button backButton = view.findViewById(R.id.btBackTodo);
-    backButton.setOnClickListener(v -> {
-      Toast.makeText(getContext(), "戻るボタンがクリックされました", Toast.LENGTH_SHORT).show();
-      getParentFragmentManager().setFragmentResult(REQUEST_KEY, new Bundle()); //(MainActivity に)通知
     });
 
     Button addButton = view.findViewById(R.id.btAdd);
@@ -77,6 +73,12 @@ class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
     Log.d(LOG_TAG, "Task replaced: " + index + " is " + newTask);
     taskList.set(index, newTask);
     notifyItemChanged(index);
+  }
+
+  void remove(int index) {
+    Log.d(LOG_TAG, "Task removed: " + index);
+    taskList.remove(index);
+    notifyItemRemoved(index);
   }
 
   @NonNull
