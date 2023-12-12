@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.*;
 import android.widget.*;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -45,7 +47,7 @@ public class TodoFragment extends Fragment {
       }
     });
 
-    Button addButton = view.findViewById(R.id.btAdd);
+    FloatingActionButton addButton = view.findViewById(R.id.fab);
     addButton.setOnClickListener(v -> {
       Toast.makeText(getContext(), "追加ボタンがクリックされました", Toast.LENGTH_SHORT).show();
       AddTaskFragment.showDialog(fm);
