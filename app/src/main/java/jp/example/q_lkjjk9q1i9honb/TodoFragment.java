@@ -2,6 +2,7 @@ package jp.example.q_lkjjk9q1i9honb;
 
 import androidx.annotation.*;
 import androidx.fragment.app.*;
+import androidx.lifecycle.*;
 import androidx.recyclerview.widget.*;
 
 import android.os.Bundle;
@@ -11,9 +12,6 @@ import android.widget.*;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.*;
 
@@ -26,9 +24,10 @@ public class TodoFragment extends Fragment {
   public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
+    TaskViewModel taskViewModel = new ViewModelProvider(requireActivity()).get(TaskViewModel.class);
     FragmentManager fm = getChildFragmentManager();
 
-    TaskAdapter taskAdapter = new TaskAdapter((i,task) -> AddTaskFragment.showDialog(fm,i,task));
+    TaskAdapter taskAdapter = new TaskAdapter(taskViewModel, (i,task) -> AddTaskFragment.showDialog(fm,i,task));
     RecyclerView recyclerView = view.findViewById(R.id.recyclerViewTasks);
     recyclerView.addItemDecoration(new DividerItemDecoration(requireContext(), DividerItemDecoration.VERTICAL));
     recyclerView.setAdapter(taskAdapter);
@@ -58,28 +57,34 @@ public class TodoFragment extends Fragment {
 class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
   private static final String LOG_TAG = "TaskAdapter";
 
+  private final TaskViewModel taskViewModel;
   private final List<Task> taskList = new ArrayList<>();
   private final BiConsumer<Integer,Task> clickListener;
 
-  TaskAdapter(BiConsumer<Integer,Task> clickListener) {
+  TaskAdapter(TaskViewModel taskViewModel, BiConsumer<Integer,Task> clickListener) {
+    this.taskViewModel = taskViewModel;
+    this.taskList.addAll(taskViewModel.getTaskList().getValue());
     this.clickListener = clickListener;
   }
 
   void add(Task task) {
     Log.d(LOG_TAG, "Task added: " + task);
     taskList.add(task);
+    taskViewModel.setTaskList(taskList);
     notifyItemInserted(taskList.size()-1);
   }
 
   void set(int index, Task newTask) {
     Log.d(LOG_TAG, "Task replaced: " + index + " is " + newTask);
     taskList.set(index, newTask);
+    taskViewModel.setTaskList(taskList);
     notifyItemChanged(index);
   }
 
   void remove(int index) {
     Log.d(LOG_TAG, "Task removed: " + index);
     taskList.remove(index);
+    taskViewModel.setTaskList(taskList);
     notifyItemRemoved(index);
   }
 
@@ -116,29 +121,5 @@ class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.ViewHolder> {
       nameView.setText(task.name);
       datetimeView.setText(task.getDatetime());
     }
-  }
-}
-
-class Task implements Serializable {
-  private static final String DATE_FORMAT = "yyyy/MM/dd";
-  private static final String TIME_FORMAT = "HH:mm";
-  static final DateTimeFormatter datetimeFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT + " " + TIME_FORMAT);
-  static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
-  static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern(TIME_FORMAT);
-
-  final String name;
-  final LocalDateTime datetime;
-
-  public Task(String name, LocalDateTime datetime) {
-    this.name = name;
-    this.datetime = datetime;
-  }
-  String getDatetime() {
-    return datetimeFormatter.format(datetime);
-  }
-
-  @Override
-  public String toString() {
-    return name + " at " + getDatetime();
   }
 }
