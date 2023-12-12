@@ -10,7 +10,7 @@ import java.util.*;
 public class TaskViewModel extends ViewModel {
   private MutableLiveData<List<Task>> taskListLiveData = new MutableLiveData<>(Collections.emptyList());
   LiveData<List<Task>> getTaskList() { return taskListLiveData; }
-  void setTaskList(List<Task> taskList) { taskListLiveData.setValue(Collections.unmodifiableList(taskList)); }
+  void setTaskList(List<Task> taskList) { taskListLiveData.setValue(Collections.unmodifiableList(new ArrayList<>(taskList))); }
 }
 
 class Task implements Serializable {
